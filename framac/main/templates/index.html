@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frama-C</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'js/script.js' %}"> </script>
+</head>
+
+<body class="version1">
+    <div class="app">
+        <nav class="menu_bar">
+            <form id="uploadFileForm" style="float: left; height: 100%" action="/upload" method="post"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" id="file" name="file" />
+                <input id="uploadFileButton" style="height: 100%" class="not_selected_button" type="submit"
+                value="Upload">
+            </form>
+
+            <button id="newFileButton" class="not_selected_button">Add File </button>
+            <button id="newDirectoryButton" class="not_selected_button">Add Directory </button>
+            <button id="deleteButton" class="not_selected_button">Delete Selected</button>
+            <button id="rerunButton" class="not_selected_button">Rerun Verification</button>
+
+
+            {% if logged != 'yes' %}
+            <form style="float: right; height: 100%; margin-top: 1.3%" action="/login" method="post"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                <input style="float: left" name='username' placeholder="username"></input>
+                <input style="float: left" type="password" name='password' placeholder="password"></input>
+                <input style="float: left" class="not_selected_button" type="submit" value="log in">
+            </form>
+            {% endif %}
+            {% if logged == 'yes' %}
+            <form style="float: right; height: 100%" action="/logout" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input style="float: left; height: 100%" class="not_selected_button" type="submit" value="log out">
+            </form>
+            {% endif %}
+        </nav>
+
+
+        <nav class="file_selection_dialog">
+            <div id="fileTree">
+                {% for i, directory, files in directories %}
+                    <div id="dir{{i}}">
+                        <button id="{{i}}" style="text-align: left" class="not_selected_button_directory">{{directory.name}} </button>
+                        {% for j, file in files %}
+                            <button id="{{i}}_{{j}}" class="not_selected_button_file_tree">{{file.name}}.c </button>
+                        {% endfor %}
+                    </div>
+                    <input id="newFile{{i}}" class="selected_button_new_file" name="newFile" type="text"value="Name of new file">
+                {% endfor %}
+            </div>
+            <input id="nameOfNewDirectory" class="selected_button" name="newDirectory" type="text"value="Name of new directory">
+        </nav>
+
+
+
+        <main class="main_content">
+            <textarea id="code" style="width: 98%; height: 100%" name='code'
+                placeholder="write your code here">{{code}}</textarea>
+            <button id="compile" style="margin-left: 83%" class="selected_button">Compile and Save</button>
+        </main>
+        <div id="focus" style="overflow-y:scroll;" class="focus_on_elements"></div>
+        <nav class="tabs">
+            <button id="resultButtonSelected" class="selected_button">Result</button>
+            <button id="resultButtonNotSelected" class="not_selected_button">Result</button>
+
+            <button id="proversButtonSelected" class="selected_button">Provers</button>
+            <button id="proversButtonNotSelected" class="not_selected_button">Provers</button>
+
+            <button id="vcsButtonNotSelected" class="not_selected_button">VCs</button>
+            <button id="vcsButtonSelected" class="selected_button">VCs</button>
+
+        </nav>
+        <div class="tab_content">
+            <div id="proversDiv">
+                <button id="Z3ButtonSelected" class="selected_button">Z3</button>
+                <button id="Z3ButtonNotSelected" class="not_selected_button">Z3</button>
+
+                <button id="CVC4ButtonSelected" class="selected_button">CVC4</button>
+                <button id="CVC4ButtonNotSelected" class="not_selected_button">CVC4</button>
+
+                <button id="Alt-ErgoButtonSelected" class="selected_button">Alt-Ergo</button>
+                <button id="Alt-ErgoButtonNotSelected" class="not_selected_button">Alt-Ergo</button>
+            </div>
+            <div id="resultDiv"></div>
+
+            <div id="vcsDiv">
+                <input id="vcsInput" style="width: 50%; margin-right: 50%; margin-bottom: 2%" class="selected_button"
+                    name="vc" type="text" value='{{vc}}'>
+                <button id="vcsSubmit" class="not_selected_button">Submit</button>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

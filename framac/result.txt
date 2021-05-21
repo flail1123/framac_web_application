@@ -1,0 +1,22 @@
+[kernel] Parsing temp_framac.c (with preprocessing)
+[wp] Running WP plugin...
+[wp] warning: Missing RTE guards
+[wp] 1 goal scheduled
+[wp] [Alt-Ergo] Goal typed_Sterbenz_post : Unknown (Qed:3ms) (102ms)
+[wp] Proved goals:    0 / 1
+    Alt-Ergo:        0  (unknown: 1)
+------------------------------------------------------------
+  Function Sterbenz
+------------------------------------------------------------
+
+Goal Post-condition (file temp_framac.c, line 2) in 'Sterbenz':
+Let r = add_float32(x, -y).
+Assume {
+  Type: is_float32(x) /\ is_float32(y) /\ is_float32(r).
+  (* Pre-condition *)
+  Have: ((y / (2)) <= x) /\ (x <= ((2) * y)).
+}
+Prove: (y + r) = x.
+Prover Alt-Ergo returns Unknown (Qed:3ms) (102ms)
+
+------------------------------------------------------------

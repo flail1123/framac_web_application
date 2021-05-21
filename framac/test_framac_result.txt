@@ -1,0 +1,1 @@
+[wp] [Alt-Ergo] Goal typed_Sterbenz_post : Unknown (Qed:3ms) (102ms)<br/>[wp] Proved goals:    0 / 1<br/>Alt-Ergo:        0  (unknown: 1)<br/>

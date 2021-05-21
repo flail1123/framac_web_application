@@ -15,7 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from main.views import homeView, login, logout, newFile, prover, vcs, compile, delete, select, newDirectory, upload
 
 urlpatterns = [
+    path('', homeView, name='emptyHome'),
+    path('login', login, name='login'),
+    path('logout', logout, name='logout'),
+    path('select', select, name='select'),
+    path('delete', delete, name='delete'),
+    path('prover', prover, name='prover'),
+    path('vcs', vcs, name='vcs'),
+    path('compile', compile, name='compile'),
+    path('newFile', newFile, name='newFile'),
+    path('upload', upload, name='upload'),
+    path('newDirectory', newDirectory, name='newDirectory'),
     path('admin/', admin.site.urls),
 ]
