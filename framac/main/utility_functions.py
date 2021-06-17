@@ -50,28 +50,6 @@ def doResult(file):
     with open("result.txt", 'r') as f:
         return f.read().replace("\n", "<br/>")
 
-def sliceFile(file):
-    code = file.code
-    sections = []
-    while(len(code) > 0):
-        try:
-            a = code.find('/*@')
-            b = code[a+2:].find('/*@')
-            section = code[a:b]
-            code = code[b:]
-            sections.append(section)
-            if a == -1 or b == -1:
-                break
-        except:
-            break
-
-    for section in sections:
-        reg1 = compile(r'^/{1, 2}@/s*(/w+)')
-        try:
-            sectionCategory = reg1.findall(section)
-        except:
-            sectionCategory = ""
-        FileSection.objects.create(file=file, code=section, section_category=sectionCategory)
 
 
 

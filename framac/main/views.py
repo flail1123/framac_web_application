@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User, auth
 from .models import *
 from .forms import UploadFileForm
@@ -8,6 +8,7 @@ from .utility_functions import *
 
 
 def homeView(request):
+
     if not request.user.is_authenticated:
         return redirect('/login')
 
@@ -61,13 +62,14 @@ def delete(request):
     if request.method == 'POST':
         directory = Directory.objects.filter(owner=owner)[selectedDirectory]
         files = File.objects.filter(directory=directory.id)
-        if len(files) == 0:
+        if len(files.filter(availability_flag=True)) == 0:
             directory.availability_flag = False
             directory.save()
             return JsonResponse({"whatWasDeleted": "directory"})
         else:
-            files[selectedFile].availability_flag = False
-            files[selectedFile].save()
+            file = getFile(selectedDirectory, selectedFile, request.user)
+            file.availability_flag = False
+            file.save()
             return JsonResponse({"whatWasDeleted": "file"})
 
 
@@ -123,12 +125,11 @@ def select(request):
 def upload(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            selectedFile, selectedDirectory = getSelected(request.user)
-            directory = Directory.objects.filter(owner=request.user)[selectedDirectory]
-            newFile = File.objects.create(name=request.FILES['file'].name[:-2], owner=request.user, directory=directory, code=request.FILES['file'].read().decode('utf-8'))
-            number = str(len(File.objects.filter(directory=directory.id)) - 1)
-            return JsonResponse({"name": request.FILES['file'].name, "id": str(selectedDirectory) + "_" + number, "dir": str(selectedDirectory)})
+        selectedFile, selectedDirectory = getSelected(request.user)
+        directory = Directory.objects.filter(owner=request.user)[selectedDirectory]
+        newFile = File.objects.create(name=request.FILES['file'].name[:-2], owner=request.user, directory=directory, code=request.FILES['file'].read().decode('utf-8'))
+        number = str(len(File.objects.filter(directory=directory.id)) - 1)
+        return JsonResponse({"id": str(selectedDirectory) + "_" + number, "name": request.FILES['file'].name, 'dir': str(selectedDirectory)})
 
 
 def login(request):
@@ -142,9 +143,10 @@ def login(request):
             auth.login(request, user)
             return redirect('/')
         else:
-            return render(request, 'index.html', {'logged': 'INVALID CREDENTIALS'})
+            return render(request, 'index.html', {'logged': 'LOGIN OR PASSWORD ARE NOT CORRECT'})
     else:
         return render(request, 'index.html', {'logged': 'no'})
+
 
 def logout(request):
     auth.logout(request)

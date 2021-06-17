@@ -79,11 +79,15 @@ class QuestionModelTests(TestCase):
         assert directory.name == "newDirectory2"
 
     def test_delete_view(self):
-        request = self.request_factory.post(reverse('newDirectory'), {"name": "newDirectory2"})
+        request = self.request_factory.post(reverse('delete'), {"name": "newDirectory2"})
         request.user = self.user
         response = delete(request)
         dictionary = json.loads(response.content.decode('utf-8'))
         assert dictionary["whatWasDeleted"] == "file"
+
+        response = delete(request)
+        dictionary = json.loads(response.content.decode('utf-8'))
+        assert dictionary["whatWasDeleted"] == "directory"
 
     def test_prover(self):
         request = self.request_factory.post(reverse('prover'), {"prover": "newProver"})
@@ -103,16 +107,6 @@ class QuestionModelTests(TestCase):
         file = getFile(self.selected.selected_directory, self.selected.selected_file, self.user)
         assert file.vc == "newVC" 
 
-    def test_upload_view(self):
-        with open('test_framac_file.c', "rb") as f:
-            request = self.request_factory.post(reverse('upload'), {"name": "test_framac_file","file": f})
-            request.user = self.user
-            response = upload(request)
-            dictionary = json.loads(response.content.decode('utf-8'))
-            assert dictionary["name"] == "test_framac_file.c"
-            assert dictionary["id"] == "0_1"
-            assert dictionary["dir"] == "0"
-
     def test_compile_view(self):
         file = getFile(self.selected.selected_directory, self.selected.selected_file, self.user)
         with open('test_framac_file.c', "r") as f:
@@ -130,9 +124,24 @@ class QuestionModelTests(TestCase):
         assert dictionary["code"] == file.code
         assert dictionary["id"] == ""
 
+
+        request = self.request_factory.post(reverse('select'), {"selected": "0"})
+        request.user = self.user
+        response = select(request)
+        dictionary = json.loads(response.content.decode('utf-8'))
+        file = getFile(self.selected.selected_directory, self.selected.selected_file, self.user)
+        assert dictionary["code"] == file.code
+
+
     def test_login_view(self):
         request = self.request_factory.post(reverse('login'), {})
         request.user = self.user
+        response = login(request)
+        assert response.status_code == 302
+
+        
+        request = self.request_factory.post(reverse('login'), {})
+        request.user = User.objects.create(username="not_logged_in", password="user")
         response = login(request)
         assert response.status_code == 302
 
@@ -143,6 +152,17 @@ class QuestionModelTests(TestCase):
         response = homeView(request)
         assert response.status_code == 200
         assert response.content.decode('utf-8')[:16] == "\n<!DOCTYPE html>"
+
+    def test_upload(self):
+        with open('plik.c') as fp:
+            request = self.request_factory.post(reverse('upload'), {"file": fp})
+            request.user = self.user
+            response = upload(request)
+            dictionary = json.loads(response.content.decode('utf-8'))
+            assert dictionary["name"] == "plik.c"
+            assert dictionary["id"] == "0_1"
+            assert dictionary["dir"] == "0"
+
 
 
 # https://docs.djangoproject.com/en/3.1/topics/testing/overview/
