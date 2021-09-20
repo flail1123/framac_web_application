@@ -1,6 +1,6 @@
 # framac_web_application
 
-Django web aplication for online compiling and editing c code. 
+Django web aplication for online compiling and editing of c code. 
 
 It is possible to both create new file in the editor or import from local computer and create directories.
 
